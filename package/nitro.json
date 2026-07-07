@@ -1,0 +1,26 @@
+{
+  "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "cxxNamespace": [
+    "nitrovibrato"
+  ],
+  "ios": {
+    "iosModuleName": "NitroVibrato"
+  },
+  "android": {
+    "androidNamespace": [
+      "nitrovibrato"
+    ],
+    "androidCxxLibName": "NitroVibrato"
+  },
+  "autolinking": {
+    "NitroVibrato": {
+        "all": {
+            "implementationClassName": "HybridNitroVibrato",
+            "language": "c++"
+        }
+    }
+  },
+  "ignorePaths": [
+    "**/node_modules"
+  ]
+}
