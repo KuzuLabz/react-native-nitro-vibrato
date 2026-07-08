@@ -6,13 +6,13 @@ import { File } from 'expo-file-system';
 
 const getDictFiles = async () => {
     const assets = await Asset.loadAsync([
-        require('../../assets/dicts/split/char.def'),
-        require('../../assets/dicts/split/lex.csv'),
-        require('../../assets/dicts/split/matrix.def'),
-        require('../../assets/dicts/split/unk.def'),
+        // require('../../assets/dicts/split/char.def'),
+        // require('../../assets/dicts/split/lex.csv'),
+        // require('../../assets/dicts/split/matrix.def'),
+        // require('../../assets/dicts/split/unk.def'),
     ]);
 
-    return assets.map((asset) => {
+    return assets?.map((asset) => {
         if (asset.localUri) {
             return new File(asset.localUri);
         } else {
