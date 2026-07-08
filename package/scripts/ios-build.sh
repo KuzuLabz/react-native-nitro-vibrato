@@ -1,34 +1,52 @@
 #!/bin/bash
 set -e
 
-cd ../rust/vibrato-nitro/uniffi
+cd ./rust/vibrato-nitro/uniffi
+
+TARGET_DIR="../target"
+FRAMEWORK_NAME="VibratoNative"
+CRATE_NAME="vibrato_native"
+OUTPUT_DIR="../../../ios/Frameworks"
+LIBS_DIR="ios/libs"
+HEADER_DIR="ios/libs/headers"
+HEADER_NAME="vibrato.h"
+
+echo "📁 Cleaning up old artifacts..."
+rm -rf "$LIBS_DIR"
+rm -rf "$OUTPUT_DIR/$FRAMEWORK_NAME.xcframework"
+mkdir -p "$LIBS_DIR/device"
+mkdir -p "$LIBS_DIR/simulator"
+mkdir -p "$LIBS_DIR/headers"
+mkdir -p "$OUTPUT_DIR"
 
 # Compile targets
-cargo build --target aarch64-apple-ios --release
-cargo build --target aarch64-apple-ios-sim --release
+echo "🦀 Compiling Rust targets..."
+cargo build --release --target aarch64-apple-ios
+cargo build --release --target aarch64-apple-ios-sim
+cargo build --release --target x86_64-apple-ios
 
-# Create a unified XCFramework or fat library inside your ios/ folder
-mkdir -p ../../../ios/Frameworks
-mkdir -p ios/libs/device
-mkdir -p ios/libs/simulator
 
-cp target/aarch64-apple-ios/release/libvibrato_native.a ios/libs/device/libvibrato_native.a
+cp "${TARGET_DIR}/aarch64-apple-ios/release/lib${CRATE_NAME}.a" "${LIBS_DIR}/device/lib${CRATE_NAME}.a"
 
-# Combine them if needed or use xcrun to wrap into an XCFramework
+echo "🧬 Stitching simulator slices into a universal binary via lipo..."
 lipo -create \
-  target/aarch64-apple-ios-sim/release/libvibrato_native.a \
-  target/x86_64-apple-ios/release/libvibrato_native.a \
-  -output ios/libs/simulator/libvibrato_native.a
+  "${TARGET_DIR}/aarch64-apple-ios-sim/release/lib${CRATE_NAME}.a" \
+  "${TARGET_DIR}/x86_64-apple-ios/release/lib${CRATE_NAME}.a" \
+  -output "$LIBS_DIR/simulator/lib${CRATE_NAME}.a"
 
-rm -rf ../../../ios/Frameworks/VibratoNative.xcframework
+cbindgen --config cbindgen.toml --crate uniffi --output "$HEADER_DIR/$HEADER_NAME"
 
+
+echo "💎 Assembling modern XCFramework container..."
 xcodebuild -create-xcframework \
-  -library ios/libs/device/libvibrato_native.a \
-  -headers ../../../android/src/main/cpp/vibrato.h \
-  -library ios/libs/simulator/libvibrato_native.a \
-  -headers ../../../android/src/main/cpp/vibrato.h \
-  -output ../../../ios/Frameworks/VibratoNative.xcframework
+  -library "$LIBS_DIR/device/lib${CRATE_NAME}.a" \
+  -headers "${HEADER_DIR}" \
+  -library "$LIBS_DIR/simulator/lib${CRATE_NAME}.a" \
+  -headers "${HEADER_DIR}" \
+  -output "$OUTPUT_DIR/$FRAMEWORK_NAME.xcframework"
 
-rm -rf ios/libs
+echo "🧹 Cleaning up intermediate static objects..."
+rm -rf "$LIBS_DIR"
 
-echo "XCFramework bundle complete!"
+echo "✅ Success! Framework generated at:"
+echo "📂 $OUTPUT_DIR/$FRAMEWORK_NAME.xcframework"

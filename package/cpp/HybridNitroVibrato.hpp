@@ -1,7 +1,7 @@
 #include "HybridNitroVibratoSpec.hpp"
 #include <fstream>
 #include <stdexcept>
-#include <vibrato.h>
+#include "vibrato.h"
 #include <filesystem>
 
 namespace fs = std::filesystem;
