@@ -16,14 +16,16 @@ interface FilePaths {
     unkPath: string;
 }
 
+type UserDict = string | ArrayBuffer
+
 export interface NitroVibrato extends HybridObject<{
   ios: 'c++',
   android: 'c++'
 }> {
-  initialize(dictionaryPath: string, options?: InitializeOptions): Promise<void>;
-  initializeFromBytes(bytes: ArrayBuffer, options?: InitializeOptions): Promise<void>;
-  initializeFromTextdict(files: FilePaths, options?: InitializeOptions): Promise<void>;
-  initializeFromTextdictBytes(files: FileBytes, options?: InitializeOptions): Promise<void>;
+  initialize(dictionaryPath: string, userDict?: UserDict, options?: InitializeOptions): Promise<void>;
+  initializeFromBytes(bytes: ArrayBuffer, userDict?: UserDict, options?: InitializeOptions): Promise<void>;
+  initializeFromTextdict(files: FilePaths, userDict?: UserDict, options?: InitializeOptions): Promise<void>;
+  initializeFromTextdictBytes(files: FileBytes, userDict?: UserDict, options?: InitializeOptions): Promise<void>;
   tokenize(text: string): Promise<Token[]>;
   compileDict(files: FilePaths): Promise<ArrayBuffer>;
   compileDictBytes(files: FileBytes): Promise<ArrayBuffer>;
