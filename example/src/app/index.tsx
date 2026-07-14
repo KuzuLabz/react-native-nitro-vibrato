@@ -1,11 +1,12 @@
 import { Platform, StyleSheet } from "react-native";
 import { Vibrato, Token, MecabPreset, useVibratoInitialized } from '@kuzulabz/react-native-nitro-vibrato';
 import { useCallback, useState } from "react";
-import { Host, Text, useNativeState, Column, Row, Button } from '@expo/ui';
+import { Host, useNativeState, Column } from '@expo/ui';
 import { getDictData } from "@/utils/zstd";
 import { TextInput } from "@/components/textInput/input";
 import { Controls } from "@/components/controls";
 import { Tokens } from "@/components/tokens/tokens";
+import { SOURCE_COLOR } from "@/constants";
 // import { compileDict } from "@/utils/compile.native";
 
 export default function Index() {
@@ -19,13 +20,13 @@ export default function Index() {
             'worklet';
             text.value =  value;
         },
-        [text]
+        [text.value]
     );
 
     const onInit = async () => {
         try {
             setIsLoading(true);
-            const zstDic = await getDictData();
+            const zstDic = await getDictData('uri');
             await Vibrato.initialize(zstDic, undefined, MecabPreset);
         } catch (e) {
             console.error(e);
@@ -50,7 +51,7 @@ export default function Index() {
     };
 
     return (
-        <Host style={styles.container}>
+        <Host seedColor={SOURCE_COLOR} colorScheme="dark" style={styles.container}>
             <Column spacing={8} alignment="center" style={{paddingTop: 12, paddingHorizontal: 12}}>
                 <TextInput value={text} onChangeText={handleChangeText} />
                 <Controls isInit={isInit} onInit={onInit} onTokenize={onTokenize} onWakati={onWakati} onDestroy={onDestroy} isLoading={isLoading} />
