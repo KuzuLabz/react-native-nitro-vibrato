@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Token } from "@kuzulabz/react-native-nitro-vibrato";
 import { InfoSheet } from "../info/info";
 import { Pressable, View } from "react-native";
+import { SECONDARY_COLOR } from "@/constants";
 
 const TokenItem = ({label, onPress}: {label: string; onPress: () => void}) => {
     return(
-        <Pressable onPress={onPress} style={{padding: 6, paddingHorizontal: 12, justifyContent: 'center', height: '100%', borderRadius: 12, borderWidth: 0.5, backgroundColor: '#00489a'}}>
+        <Pressable onPress={onPress} style={{padding: 6, paddingHorizontal: 12, justifyContent: 'center', height: '100%', borderRadius: 12, borderWidth: 0.5, backgroundColor: SECONDARY_COLOR}}>
             <Text>{label}</Text>
         </Pressable>
     );

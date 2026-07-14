@@ -9,7 +9,7 @@ export const Tokens = ({ tokens }: TokensProps) => {
 
     return(
         <AnimatedVisibility visible={!!tokens}>
-            <FlowRow horizontalArrangement={{spacedBy: 8}}>
+            <FlowRow horizontalArrangement={{spacedBy: 6}}>
                 {tokens?.map((token, idx) => (
                     <SuggestionChip key={idx} onClick={() => setSelectedToken(token)}>
                         <SuggestionChip.Label>
