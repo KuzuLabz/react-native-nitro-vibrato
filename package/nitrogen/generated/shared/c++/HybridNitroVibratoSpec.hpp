@@ -24,9 +24,10 @@ namespace margelo::nitro::nitrovibrato { struct Token; }
 
 #include <NitroModules/Promise.hpp>
 #include <string>
-#include "InitializeOptions.hpp"
-#include <optional>
 #include <NitroModules/ArrayBuffer.hpp>
+#include <variant>
+#include <optional>
+#include "InitializeOptions.hpp"
 #include "FilePaths.hpp"
 #include "FileBytes.hpp"
 #include "Token.hpp"
@@ -63,10 +64,10 @@ namespace margelo::nitro::nitrovibrato {
 
     public:
       // Methods
-      virtual std::shared_ptr<Promise<void>> initialize(const std::string& dictionaryPath, const std::optional<InitializeOptions>& options) = 0;
-      virtual std::shared_ptr<Promise<void>> initializeFromBytes(const std::shared_ptr<ArrayBuffer>& bytes, const std::optional<InitializeOptions>& options) = 0;
-      virtual std::shared_ptr<Promise<void>> initializeFromTextdict(const FilePaths& files, const std::optional<InitializeOptions>& options) = 0;
-      virtual std::shared_ptr<Promise<void>> initializeFromTextdictBytes(const FileBytes& files, const std::optional<InitializeOptions>& options) = 0;
+      virtual std::shared_ptr<Promise<void>> initialize(const std::string& dictionaryPath, const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>>& userDict, const std::optional<InitializeOptions>& options) = 0;
+      virtual std::shared_ptr<Promise<void>> initializeFromBytes(const std::shared_ptr<ArrayBuffer>& bytes, const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>>& userDict, const std::optional<InitializeOptions>& options) = 0;
+      virtual std::shared_ptr<Promise<void>> initializeFromTextdict(const FilePaths& files, const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>>& userDict, const std::optional<InitializeOptions>& options) = 0;
+      virtual std::shared_ptr<Promise<void>> initializeFromTextdictBytes(const FileBytes& files, const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>>& userDict, const std::optional<InitializeOptions>& options) = 0;
       virtual std::shared_ptr<Promise<std::vector<Token>>> tokenize(const std::string& text) = 0;
       virtual std::shared_ptr<Promise<std::shared_ptr<ArrayBuffer>>> compileDict(const FilePaths& files) = 0;
       virtual std::shared_ptr<Promise<std::shared_ptr<ArrayBuffer>>> compileDictBytes(const FileBytes& files) = 0;

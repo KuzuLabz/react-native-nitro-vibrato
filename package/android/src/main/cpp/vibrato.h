@@ -38,6 +38,8 @@ char *vibrato_get_last_error();
 
 NativeTokenizer *vibrato_create(const uint8_t *bytes_ptr,
                                 uintptr_t length,
+                                const uint8_t *user_dict_ptr,
+                                uintptr_t user_dict_length,
                                 const bool *ignore_space,
                                 const uintptr_t *max_grouping_len);
 
@@ -49,6 +51,8 @@ NativeTokenizer *vibrato_create_from_textdict(const uint8_t *lex_ptr,
                                               uintptr_t char_len,
                                               const uint8_t *unk_ptr,
                                               uintptr_t unk_len,
+                                              const uint8_t *user_dict_ptr,
+                                              uintptr_t user_dict_length,
                                               const bool *ignore_space,
                                               const uintptr_t *max_grouping_len);
 

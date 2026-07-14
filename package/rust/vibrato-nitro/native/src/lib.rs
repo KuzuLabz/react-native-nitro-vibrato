@@ -49,14 +49,13 @@ thread_local! {
     static LAST_ERROR: RefCell<String> = RefCell::new(String::new());
 }
 
-// Helper to update the last error message
 fn set_last_error(err: String) {
     LAST_ERROR.with(|prev| {
         *prev.borrow_mut() = err;
     });
 }
 
-// Expose a function to fetch the last error from C++
+
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn vibrato_get_last_error() -> *mut c_char {
     let mut err_str = String::new();
@@ -70,6 +69,8 @@ pub unsafe extern "C" fn vibrato_get_last_error() -> *mut c_char {
 pub unsafe extern "C" fn vibrato_create(
     bytes_ptr: *const u8,
     length: usize,
+    user_dict_ptr: *const u8,
+    user_dict_length: usize,
     ignore_space: *const bool,
     max_grouping_len: *const usize,
 ) -> *mut NativeTokenizer {
@@ -80,14 +81,20 @@ pub unsafe extern "C" fn vibrato_create(
     let opt_ignore_space = if ignore_space.is_null() { false } else { unsafe { *ignore_space } };
     let opt_max_grouping_len = if max_grouping_len.is_null() { 0 } else { unsafe { *max_grouping_len } };
 
-    // Safely reconstruct the byte slice from the C pointer and length
     let bytes = unsafe { slice::from_raw_parts(bytes_ptr, length) };
 
-    // Read the dictionary straight from memory
-    let dict = match Dictionary::read(bytes) {
+    let mut dict = match Dictionary::read(bytes) {
         Ok(d) => d,
         Err(_) => return std::ptr::null_mut(),
     };
+
+    if !user_dict_ptr.is_null() {
+        let user_dict_bytes = unsafe { slice::from_raw_parts(user_dict_ptr, user_dict_length) };
+        dict = match dict.reset_user_lexicon_from_reader(Some(user_dict_bytes)) {
+            Ok(d) => d,
+            Err(_) => return std::ptr::null_mut(),
+        };
+    }
 
     let result = Tokenizer::new(dict)
     .ignore_space(opt_ignore_space)
@@ -109,27 +116,38 @@ pub unsafe extern "C" fn vibrato_create_from_textdict(
     matrix_ptr: *const u8, matrix_len: usize,
     char_ptr: *const u8, char_len: usize,
     unk_ptr: *const u8, unk_len: usize,
+    user_dict_ptr: *const u8,
+    user_dict_length: usize,
     ignore_space: *const bool,
     max_grouping_len: *const usize,
 ) -> *mut NativeTokenizer {
-    // Reconstruct byte slices safely from raw pointers
     let lex_data = unsafe { slice::from_raw_parts(lex_ptr, lex_len) };
     let matrix_data = unsafe { slice::from_raw_parts(matrix_ptr, matrix_len) };
     let char_data = unsafe { slice::from_raw_parts(char_ptr, char_len) };
     let unk_data = unsafe { slice::from_raw_parts(unk_ptr, unk_len) };
 
-    // Extract optional parameters from pointers
     let opt_ignore_space = if ignore_space.is_null() { false } else { unsafe { *ignore_space } };
     let opt_max_grouping_len = if max_grouping_len.is_null() { 0 } else { unsafe { *max_grouping_len } };
 
-    // Build the system dictionary using your identical WASM implementation logic
-    let result = SystemDictionaryBuilder::from_readers(
+    let mut dictionary = match SystemDictionaryBuilder::from_readers(
         lex_data,
         matrix_data,
         char_data,
         unk_data,
-    )
-    .and_then(|dict| Tokenizer::new(dict).ignore_space(opt_ignore_space))
+    ) {
+        Ok(d) => d,
+        Err(_) => return std::ptr::null_mut(),
+    };
+
+    if !user_dict_ptr.is_null() {
+        let user_dict_bytes = unsafe { slice::from_raw_parts(user_dict_ptr, user_dict_length) };
+        dictionary = match dictionary.reset_user_lexicon_from_reader(Some(user_dict_bytes)) {
+            Ok(d) => d,
+            Err(_) => return std::ptr::null_mut(),
+        };
+    }
+
+    let result = Tokenizer::new(dictionary).ignore_space(opt_ignore_space)
     .map(|tokenizer| tokenizer.max_grouping_len(opt_max_grouping_len));
 
     match result {

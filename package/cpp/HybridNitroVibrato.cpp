@@ -13,10 +13,13 @@ namespace margelo::nitro::nitrovibrato {
         this->tokenizer.reset();
     }
 
-    std::shared_ptr<Promise<void>> HybridNitroVibrato::initialize(const std::string &dictionaryPath,
-                                                                  const std::optional<InitializeOptions> &options) {
+    std::shared_ptr<Promise<void>> HybridNitroVibrato::initialize(const std::string &dictionaryPath, 
+        const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>>& userDict,
+        const std::optional<InitializeOptions> &options) {
+
         return Promise<void>::async([=, this]() {
             auto dict_file = this->readFileFromPath(dictionaryPath);
+            auto user_dict = HybridNitroVibrato::getUserDict(userDict);
 
             if (this->tokenizer != nullptr) {
                 this->tokenizer = nullptr;
@@ -34,7 +37,11 @@ namespace margelo::nitro::nitrovibrato {
                 }
             }
 
-            NativeTokenizer* raw_tokenizer = vibrato_create(dict_file.data(), dict_file.size(), &ignoreSpaceValue, &maxGroupingValue);
+            NativeTokenizer* raw_tokenizer = vibrato_create(
+                dict_file.data(), dict_file.size(), 
+                user_dict.empty() ? nullptr : user_dict.data(), user_dict.size(), 
+                &ignoreSpaceValue, &maxGroupingValue
+            );
 
             this->throwInitError(raw_tokenizer);
 
@@ -48,10 +55,13 @@ namespace margelo::nitro::nitrovibrato {
 
     std::shared_ptr<Promise<void>>
     HybridNitroVibrato::initializeFromBytes(const std::shared_ptr<ArrayBuffer> &bytes,
-                                            const std::optional<InitializeOptions> &options) {
+        const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>>& userDict,
+        const std::optional<InitializeOptions> &options) {
         std::shared_ptr<ArrayBuffer> safeBuffer = bytes->isOwner() 
             ? bytes 
             : ArrayBuffer::copy(bytes);
+
+        auto user_dict = HybridNitroVibrato::getUserDict(userDict);
 
         return Promise<void>::async([=, this]() {
             if (this->tokenizer != nullptr) {
@@ -68,9 +78,13 @@ namespace margelo::nitro::nitrovibrato {
                 if (options->maxGroupingLength.has_value()) {
                     maxGroupingValue = static_cast<uintptr_t>(options->maxGroupingLength.value());
                 }
-            }
+            };
 
-            NativeTokenizer* raw_tokenizer = vibrato_create(safeBuffer->data(), safeBuffer->size(), &ignoreSpaceValue, &maxGroupingValue);
+            NativeTokenizer* raw_tokenizer = vibrato_create(
+                safeBuffer->data(), safeBuffer->size(), 
+                user_dict.empty() ? nullptr : user_dict.data(), user_dict.size(), 
+                &ignoreSpaceValue, &maxGroupingValue
+            );
 
             this->throwInitError(raw_tokenizer);
 
@@ -84,12 +98,15 @@ namespace margelo::nitro::nitrovibrato {
 
     std::shared_ptr<Promise<void>>
     HybridNitroVibrato::initializeFromTextdict(const FilePaths &files,
-                                               const std::optional<InitializeOptions> &options) {
+        const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>> &userDict,
+        const std::optional<InitializeOptions> &options) {
         return Promise<void>::async([=, this]() {
             auto lexBytes = this->readFileFromPath(files.lexPath);
             auto matrixBytes = this->readFileFromPath(files.matrixPath);
             auto charBytes = this->readFileFromPath(files.charPath);
             auto unkBytes = this->readFileFromPath(files.unkPath);
+
+            auto user_dict = HybridNitroVibrato::getUserDict(userDict);
 
             bool ignoreSpaceValue = false;
             uintptr_t maxGroupingValue = 0;
@@ -108,6 +125,7 @@ namespace margelo::nitro::nitrovibrato {
                 matrixBytes.data(), matrixBytes.size(),
                 charBytes.data(), charBytes.size(),
                 unkBytes.data(), unkBytes.size(),
+                user_dict.empty() ? nullptr : user_dict.data(), user_dict.size(), 
                 &ignoreSpaceValue, &maxGroupingValue
             );
 
@@ -123,11 +141,14 @@ namespace margelo::nitro::nitrovibrato {
 
     std::shared_ptr<Promise<void>>
     HybridNitroVibrato::initializeFromTextdictBytes(const FileBytes &files,
-                                                    const std::optional<InitializeOptions> &options) {
+        const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>> &userDict,
+        const std::optional<InitializeOptions> &options) {
         return Promise<void>::async([=, this]() {
             if (!files.lexBytes || !files.matrixBytes || !files.charBytes || !files.unkBytes) {
                 throw std::runtime_error("Invalid or null input buffers passed to initializeFromTextdictBytes");
             }
+
+            auto user_dict = HybridNitroVibrato::getUserDict(userDict);
 
             bool ignoreSpaceValue = false;
             uintptr_t maxGroupingValue = 0;
@@ -158,6 +179,7 @@ namespace margelo::nitro::nitrovibrato {
                 mat_ptr, mat_sz,
                 chr_ptr, chr_sz,
                 unk_ptr, unk_sz,
+                user_dict.empty() ? nullptr : user_dict.data(), user_dict.size(), 
                 &ignoreSpaceValue, &maxGroupingValue
             );
 
