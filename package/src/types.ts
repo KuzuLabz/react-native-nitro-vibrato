@@ -28,10 +28,10 @@ export interface TextdictPaths {
 }
 
 export interface TextdictBytes {
-    lex: ArrayBuffer;
-    matrix: ArrayBuffer;
-    char: ArrayBuffer;
-    unk: ArrayBuffer;
+    lex: Uint8Array;
+    matrix: Uint8Array;
+    char: Uint8Array;
+    unk: Uint8Array;
 }
 
 export interface InitializeOptions {
