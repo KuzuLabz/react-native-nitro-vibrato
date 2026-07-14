@@ -85,8 +85,9 @@ namespace margelo::nitro::nitrovibrato
 
         std::vector<uint8_t> getUserDict(const std::optional<std::variant<std::shared_ptr<ArrayBuffer>, std::string>> &userDict)
         {
+            std::vector<uint8_t> user_dict;
+
             if (!userDict.has_value()) {
-                std::vector<uint8_t> user_dict;
                 return user_dict;
             };
 
@@ -104,7 +105,10 @@ namespace margelo::nitro::nitrovibrato
                 [this](const std::string &path) {
                     return readFileFromPath(path);
                 }},
-            userDict.value());
+                userDict.value()
+            );
+
+            return user_dict;
         }
 
         void throwInitError(NativeTokenizer *raw_tokenizer)
