@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd ./rust/vibrato-nitro/uniffi
+cd ./rust/vibrato-nitro/native
 
 TARGET_DIR="../target"
 FRAMEWORK_NAME="VibratoNative"
