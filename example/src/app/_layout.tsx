@@ -1,3 +1,4 @@
+import { RootHeaderActions } from "@/components/header";
 import { initWasmAsync } from "@kuzulabz/react-native-nitro-vibrato";
 import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useEffect } from "react";
@@ -11,5 +12,5 @@ export default function RootLayout() {
             Appearance.setColorScheme('dark');
         }
     },[]);
-  return <ThemeProvider value={DarkTheme}><Stack screenOptions={{title: 'Nitro Vibrato'}}/></ThemeProvider>;
+  return <ThemeProvider value={DarkTheme}><Stack screenOptions={{title: 'Nitro Vibrato 🫨', headerRight: () => <RootHeaderActions />}}/></ThemeProvider>;
 }
