@@ -2,17 +2,7 @@ import { NitroModules } from 'react-native-nitro-modules';
 import type { NitroVibrato } from './specs/Vibrato.nitro';
 import type { InitializeOptions, TextdictBytes, TextdictPaths, Token } from './types';
 import { useEffect, useState } from 'react';
-
-export const convertToNativeBuffer = (existingBuffer: ArrayBuffer) => {
-    const nativeBuffer = NitroModules.createNativeArrayBuffer(existingBuffer.byteLength);
-
-    const sourceView = new Uint8Array(existingBuffer);
-    const targetView = new Uint8Array(nativeBuffer);
-
-    targetView.set(sourceView);
-
-  return nativeBuffer;
-}
+import { convertToNativeBuffer, processUserDict } from './convert';
 
 class VibratoClass {
     private native: NitroVibrato = NitroModules.createHybridObject<NitroVibrato>('NitroVibrato');
@@ -34,15 +24,16 @@ class VibratoClass {
         };
     }
 
-    async initialize(dic: string | ArrayBuffer, options?: InitializeOptions) {
+    async initialize(dic: string | Uint8Array, userDict?: string | Uint8Array, options?: InitializeOptions) {
         if (this.native.isInitialized) {
             this.native.freeDic();
         }
         try {
-            if (dic instanceof ArrayBuffer) {
-                await this.native.initializeFromBytes(convertToNativeBuffer(dic), options);
+            const ud = await processUserDict(userDict);
+            if (dic instanceof Uint8Array) {
+                await this.native.initializeFromBytes(convertToNativeBuffer(dic), ud, options);
             } else {
-                await this.native.initialize(dic, options);
+                await this.native.initialize(dic, ud, options);
             }
         } catch (error) {
             console.error(error);
@@ -53,25 +44,25 @@ class VibratoClass {
         
     };
 
-    async initializeFromTextDic(files: TextdictBytes | TextdictPaths, options?: InitializeOptions) {
+    async initializeFromTextDic(files: TextdictBytes | TextdictPaths, userDict?: string | ArrayBuffer, options?: InitializeOptions) {
         if (this.native.isInitialized) {
             this.native.freeDic();
         }
         try {
-            if (files.lex instanceof ArrayBuffer && files.matrix instanceof ArrayBuffer && files.char instanceof ArrayBuffer && files.unk instanceof ArrayBuffer) {
+            if (files.lex instanceof Uint8Array && files.matrix instanceof Uint8Array && files.char instanceof Uint8Array && files.unk instanceof Uint8Array) {
                 await this.native.initializeFromTextdictBytes({
                     lexBytes: convertToNativeBuffer(files.lex),
                     matrixBytes: convertToNativeBuffer(files.matrix),
                     charBytes: convertToNativeBuffer(files.char),
                     unkBytes: convertToNativeBuffer(files.unk)
-                }, options);
+                }, userDict, options);
             } else {
                 await this.native.initializeFromTextdict({
                     lexPath: files.lex as string,
                     matrixPath: files.matrix as string,
                     charPath: files.char as string,
                     unkPath: files.unk as string
-                }, options)
+                }, userDict, options)
             }
         } catch (error) {
             console.error(error);
@@ -99,7 +90,7 @@ class VibratoClass {
     }
 
     async compileDictionary(files: TextdictBytes | TextdictPaths): Promise<Uint8Array | null> {
-        if (files.lex instanceof ArrayBuffer && files.matrix instanceof ArrayBuffer && files.char instanceof ArrayBuffer && files.unk instanceof ArrayBuffer) {
+        if (files.lex instanceof Uint8Array && files.matrix instanceof Uint8Array && files.char instanceof Uint8Array && files.unk instanceof Uint8Array) {
             const data = await this.native.compileDictBytes({
                 charBytes: convertToNativeBuffer(files.char),
                 lexBytes: convertToNativeBuffer(files.lex),

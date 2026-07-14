@@ -1,4 +1,3 @@
-import { NitroModules } from "react-native-nitro-modules";
 import type { TextdictPaths } from "./types";
 
 export interface TextdictFiles {
@@ -20,18 +19,4 @@ export const getTextDictBytes = async (files: TextdictPaths): Promise<TextdictFi
         unk: await getUint8Array(files.unk)
     }
 }
-
-export const processUserDict = async (userDict?: string | Uint8Array<ArrayBufferLike>) => {
-    if (!userDict) {
-        return undefined;
-    }
-
-    if (userDict instanceof Uint8Array) {
-        return userDict;
-    } else {
-        const response = await fetch(userDict);
-        const buf = await response.arrayBuffer();
-        return new Uint8Array(buf);
-    }
-};
 

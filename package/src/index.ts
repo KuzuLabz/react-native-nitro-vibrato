@@ -2,7 +2,8 @@ import init, { initSync, Vibrato as NativeVibrato } from '../web';
 import type { InitializeOptions, TextdictBytes, TextdictPaths, Token, TokenWasm } from './types';
 import type { MecabPreset } from './constants';
 import { useEffect, useState } from 'react';
-import { getTextDictBytes, processUserDict } from './utils';
+import { getTextDictBytes } from './utils';
+import { processUserDictWeb } from './convert';
 
 class VibratoClass {
     private _native: NativeVibrato | null = null;
@@ -42,13 +43,13 @@ class VibratoClass {
      * 
      * **Path URI is not supported on web**
      */
-    async initialize(dic: string | Uint8Array<ArrayBufferLike>, userDict?: string | Uint8Array<ArrayBufferLike>, options?: InitializeOptions) {
+    async initialize(dic: string | Uint8Array, userDict?: string | Uint8Array, options?: InitializeOptions) {
         if (this._native) {
             this._native.free();
         }
 
         try {
-            const userDictData = await processUserDict(userDict);
+            const userDictData = await processUserDictWeb(userDict);
             if (dic instanceof Uint8Array) {
                 this._native = new NativeVibrato(dic, userDictData, options?.ignoreSpace, options?.maxGroupingLength);
             } else {
@@ -86,16 +87,16 @@ class VibratoClass {
      * });
      * ```
     */
-    async initializeFromTextDic(files: TextdictBytes | TextdictPaths, userDict?: string | Uint8Array<ArrayBufferLike>, options?: InitializeOptions) {
+    async initializeFromTextDic(files: TextdictBytes | TextdictPaths, userDict?: string | Uint8Array, options?: InitializeOptions) {
         if (this._native) {
             this._native.free();
         }
 
         try {
-            const userDictData = await processUserDict(userDict);
-            if (files.lex instanceof ArrayBuffer && files.matrix instanceof ArrayBuffer && files.char instanceof ArrayBuffer && files.unk instanceof ArrayBuffer) {
+            const userDictData = await processUserDictWeb(userDict);
+            if (files.lex instanceof Uint8Array && files.matrix instanceof Uint8Array && files.char instanceof Uint8Array && files.unk instanceof Uint8Array) {
                 this._native = NativeVibrato.from_textdict_bytes(
-                    new Uint8Array(files.lex), new Uint8Array(files.matrix), new Uint8Array(files.char), new Uint8Array(files.unk),
+                    files.lex, files.matrix, files.char, files.unk,
                     userDictData,
                     options?.ignoreSpace,
                     options?.maxGroupingLength
