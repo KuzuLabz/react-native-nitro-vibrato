@@ -34,7 +34,7 @@ lipo -create \
   "${TARGET_DIR}/x86_64-apple-ios/release/lib${CRATE_NAME}.a" \
   -output "$LIBS_DIR/simulator/lib${CRATE_NAME}.a"
 
-cbindgen --config cbindgen.toml --crate uniffi --output "$HEADER_DIR/$HEADER_NAME"
+cbindgen --config cbindgen.toml --crate native --output "$HEADER_DIR/$HEADER_NAME"
 
 
 echo "💎 Assembling modern XCFramework container..."
