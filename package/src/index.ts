@@ -35,13 +35,9 @@ class VibratoClass {
     /**
      * Creates a Vibrato instance.
      * 
-     * @param dic A local path uri or an ArrayBuffer
+     * @param dic A local path uri or a Uint8Arrays
      * 
      * @param options Optional dictionary settings. To get the same results as Mecab, use the {@linkcode MecabPreset}.
-     * 
-     * @platforms Android, iOS
-     * 
-     * **Path URI is not supported on web**
      */
     async initialize(dic: string | Uint8Array, userDict?: string | Uint8Array, options?: InitializeOptions) {
         if (this._native) {
@@ -69,13 +65,9 @@ class VibratoClass {
     /**
      * Creates a Vibrato instance from multiple dic files.
      * 
-     * @param files A {@linkcode TextdictPaths} object of local path URIs or a {@linkcode TextdictBytes} object of Arraybuffers.
+     * @param files A {@linkcode TextdictPaths} object of local path URIs or a {@linkcode TextdictBytes} object of Uint8Arrays.
      * 
      * @param options Optional dictionary settings. To get the same results as Mecab, use the {@linkcode MecabPreset}.
-     * 
-     * @platforms Android, iOS
-     * 
-     * **Path URI is not supported on web**
      * 
      * @example
      * ```
@@ -148,7 +140,7 @@ class VibratoClass {
 
     /**
      * Compile a system dictionary into a .dic file.
-     * @param files A {@linkcode TextdictPaths} object of local path URIs or a {@linkcode TextdictBytes} object of Arraybuffers.
+     * @param files A {@linkcode TextdictPaths} object of local path URIs or a {@linkcode TextdictBytes} object of Uint8Arrays.
      * @returns A Uint8Array of the .dic file
      */
     async compileDictionary(files: TextdictBytes | TextdictPaths): Promise<Uint8Array | null> {
