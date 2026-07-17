@@ -27,7 +27,7 @@ import { initWasmAsync, Vibrato, MecabPreset } from '@kuzulabz/react-native-nitr
 await initWasmAsync();
 
 // Minimal
-const path = 'file://.../system.dic';
+const path = 'file://.../system.dic'; // or a Uint8Array
 await Vibrato.initialize(path);
 
 // With user dictionary
