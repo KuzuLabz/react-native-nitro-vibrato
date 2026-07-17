@@ -1,6 +1,4 @@
-// import { decompress } from 'react-native-zstd';
 import { decompress } from "zstdify";
-// import { Buffer } from 'react-native-nitro-buffer';
 import { Asset } from 'expo-asset';
 import { File, Paths } from 'expo-file-system';
 
