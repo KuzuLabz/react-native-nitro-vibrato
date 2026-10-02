@@ -1,7 +1,7 @@
 {
   "name": "nitro-vibrato-example",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "dependencies": {
     "@expo/ui": "~57.0.21",
     "@kuzulabz/react-native-nitro-vibrato": "*",

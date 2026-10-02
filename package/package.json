@@ -1,6 +1,6 @@
 {
     "name": "@kuzulabz/react-native-nitro-vibrato",
-    "version": "0.0.0",
+    "version": "0.2.0",
     "description": "react-native-nitro-vibrato",
     "main": "lib/index",
     "module": "lib/index",
@@ -49,6 +49,7 @@
     "bugs": "https://github.com/KuzuLabz/react-native-nitro-vibrato/issues",
     "homepage": "https://kuzulabz.com/docs/react-native/tokenizers/vibrato",
     "publishConfig": {
+        "access": "public",
         "registry": "https://registry.npmjs.org/"
     },
     "devDependencies": {
