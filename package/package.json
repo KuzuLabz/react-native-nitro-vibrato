@@ -18,11 +18,7 @@
         "android/CMakeLists.txt",
         "android/src",
         "cpp",
-        "ios/**/*.h",
-        "ios/**/*.m",
-        "ios/**/*.mm",
-        "ios/**/*.cpp",
-        "ios/**/*.swift",
+        "ios",
         "app.plugin.js",
         "nitro.json",
         "*.podspec",
@@ -39,7 +35,7 @@
     },
     "keywords": [
         "react-native",
-        "react-native-nitro-mecab",
+        "react-native-nitro-vibrato",
         "nitro",
         "vibrato",
         "japanese",
@@ -51,7 +47,7 @@
     "author": "KuzuLabz",
     "license": "MIT",
     "bugs": "https://github.com/KuzuLabz/react-native-nitro-vibrato/issues",
-    "homepage": "https://kuzulabz.com/docs/react-native/mecab",
+    "homepage": "https://kuzulabz.com/docs/react-native/tokenizers/vibrato",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
