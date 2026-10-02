@@ -119,7 +119,7 @@
     },
     "release-it": {
         "npm": {
-            "publish": false
+            "publish": true
         },
         "git": false,
         "github": {
