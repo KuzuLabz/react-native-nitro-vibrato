@@ -2,7 +2,6 @@ import { DOCS_URL, GITHUB_URL, SOURCE_COLOR } from "@/constants";
 import { Button, Host } from "@expo/ui";
 import { useState } from "react";
 import { Image, Linking, Platform, Pressable, View } from "react-native";
-import Animated, { useAnimatedProps } from 'react-native-reanimated';
 
 const openLink = (type: 'github' | 'docs') => {
     Linking.openURL(type === 'github' ? GITHUB_URL : DOCS_URL);
@@ -14,7 +13,7 @@ export const RootHeaderActions = () => {
     const [isHovered, setIsHovered] = useState(false);
 
     return(
-        <View style={{flexDirection: 'row', alignItems: 'center', marginRight: Platform.OS === 'web' ? 12 : 0, gap: 16}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', marginRight: Platform.OS === 'web' ? 12 : 0, gap: 16, paddingHorizontal: Platform.OS === 'ios' ? 16 : undefined}}>
             <Host matchContents>
                 <Button label="Docs" variant={Platform.OS === 'web' ? "outlined" : 'text'} onPress={() => openLink('docs')} />
             </Host>
